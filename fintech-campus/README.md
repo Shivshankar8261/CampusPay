@@ -5,16 +5,37 @@ Production-style MVP for a India college–focused fintech app: simulated UPI, g
 ## Stack
 
 - **Backend:** Node.js, Express, MongoDB (Mongoose), JWT
-- **Frontend:** Next.js 14 (App Router), mobile-first CSS
+- **Frontend:** Next.js 14 (App Router), proxied API for same-origin requests
 
 ## Prerequisites
 
 - Node.js 18+
-- **MongoDB is optional.** If you do not set `MONGODB_URI`, the API starts an **in-memory MongoDB** (data resets when you stop the server). For persistent data, run Mongo locally or Atlas and set `MONGODB_URI`.
+- **MongoDB is optional.** If you do not set `MONGODB_URI`, the API uses **in-memory MongoDB** (data resets when you stop the server). Wallet updates work on **standalone MongoDB** (no replica set required).
 
-## Setup (working prototype in ~2 minutes)
+## Recommended: one command (API + web)
 
-### 1. Backend
+From **`fintech-campus/`** (this folder):
+
+```bash
+npm run setup
+npm run dev
+```
+
+This starts the API on **port 4000** and the web app on **port 3000** together.
+
+Open **http://localhost:3000** — the browser calls **`/api/...` on port 3000**; Next.js **proxies** those requests to the API (`API_ORIGIN`, default `http://127.0.0.1:4000`). You do **not** need CORS tweaks for local use.
+
+### Verify the API
+
+```bash
+npm run smoke
+```
+
+Runs an automated check of auth, payments, pools, budget, savings, loans, and parent summary (expects API on port **4000**; set `API_BASE` if different).
+
+### Manual setup (two terminals)
+
+**Backend**
 
 ```bash
 cd fintech-campus/backend
@@ -22,24 +43,17 @@ npm install
 npm run dev
 ```
 
-On first start, if the database is empty, **demo accounts are created automatically** (same as `npm run seed`).
-
-Optional: `cp .env.example .env` and set a real `JWT_SECRET` / `MONGODB_URI`.
-
-To **reset** a persistent Mongo database and reload demo data: `npm run seed`
-
-API: `http://localhost:4000`
-
-### 2. Frontend
+**Frontend**
 
 ```bash
 cd fintech-campus/frontend
-cp .env.example .env.local
 npm install
 npm run dev
 ```
 
-App: `http://localhost:3000`
+Optional: `cp .env.example .env.local` — set `API_ORIGIN` if the API is not on `127.0.0.1:4000`. For a **split deploy**, set `NEXT_PUBLIC_API_BASE` to your public API URL (and keep CORS enabled on Express).
+
+To **reset** a persistent Mongo database and reload demo data: `cd backend && npm run seed`
 
 ## Sample test data (auto-loaded on empty DB, or after `npm run seed`)
 
@@ -75,14 +89,8 @@ Group invite code: **GOA2026**
 
 ```
 fintech-campus/
+  package.json      # npm run dev (API + web), npm run smoke
+  scripts/smoke.mjs
   backend/src/
-    models/          # Mongoose schemas
-    routes/          # Express routers
-    middleware/      # JWT
-    services/        # Auto loan repayment job
-    seed.js
   frontend/
-    app/             # Next.js pages
-    components/
-    lib/api.js       # Fetch + token helper
 ```

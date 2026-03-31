@@ -1,6 +1,5 @@
 import { Router } from "express";
 import crypto from "crypto";
-import mongoose from "mongoose";
 import { Group } from "../models/Group.js";
 import { GroupContribution } from "../models/GroupContribution.js";
 import { User } from "../models/User.js";
@@ -43,7 +42,9 @@ groupsRouter.get("/", async (req, res) => {
         collected,
         status: g.status,
         inviteCode: g.inviteCode,
-        members: (g.memberIds || []).map((m) => ({ id: m._id, name: m.name, email: m.email })),
+        members: (g.memberIds || [])
+          .filter((m) => m && typeof m === "object" && m._id)
+          .map((m) => ({ id: m._id, name: m.name, email: m.email })),
         memberContributions: memberTotals[String(g._id)] || [],
         progress: Math.min(100, Math.round((collected / g.targetAmount) * 100)),
       };
@@ -94,53 +95,46 @@ groupsRouter.post("/join", async (req, res) => {
 });
 
 groupsRouter.post("/:id/contribute", async (req, res) => {
-  const { amount } = req.body;
-  const amt = Number(amount);
-  if (!Number.isFinite(amt) || amt < 1) return res.status(400).json({ error: "positive amount required" });
-  const g = await Group.findById(req.params.id);
-  if (!g || !g.memberIds.map(String).includes(String(req.userId))) {
-    return res.status(404).json({ error: "Group not found" });
-  }
-
-  const session = await mongoose.startSession();
   try {
-    await session.withTransaction(async () => {
-      const user = await User.findById(req.userId).session(session);
-      if (!user || user.walletBalance < amt) throw new Error("Insufficient balance");
-      user.walletBalance -= amt;
-      await user.save({ session });
-      await GroupContribution.create([{ groupId: g._id, userId: req.userId, amount: amt }], { session });
-      await Transaction.create(
-        [
-          {
-            userId: req.userId,
-            direction: "out",
-            amount: amt,
-            category: "Trip",
-            note: `Pool: ${g.name}`,
-            kind: "pool_contribution",
-            groupId: g._id,
-          },
-        ],
-        { session }
-      );
-      const collectedAgg = await GroupContribution.aggregate([
-        { $match: { groupId: g._id } },
-        { $group: { _id: null, total: { $sum: "$amount" } } },
-      ]).session(session);
-      const collected = collectedAgg[0]?.total || 0;
-      if (collected >= g.targetAmount && g.status === "collecting") {
-        g.status = "ready";
-        await g.save({ session });
-      }
+    const { amount } = req.body;
+    const amt = Number(amount);
+    if (!Number.isFinite(amt) || amt < 1) return res.status(400).json({ error: "positive amount required" });
+    const g = await Group.findById(req.params.id);
+    if (!g || !g.memberIds.map(String).includes(String(req.userId))) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+    if (g.status === "ready") {
+      return res.status(400).json({ error: "This pool already reached its target" });
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user || user.walletBalance < amt) return res.status(400).json({ error: "Insufficient balance" });
+
+    user.walletBalance -= amt;
+    await user.save();
+    await GroupContribution.create({ groupId: g._id, userId: req.userId, amount: amt });
+    await Transaction.create({
+      userId: req.userId,
+      direction: "out",
+      amount: amt,
+      category: "Trip",
+      note: `Pool: ${g.name}`,
+      kind: "pool_contribution",
+      groupId: g._id,
     });
-    const me = await User.findById(req.userId).lean();
-    const updated = await Group.findById(g._id).lean();
+
     const collectedAgg = await GroupContribution.aggregate([
       { $match: { groupId: g._id } },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
     const collected = collectedAgg[0]?.total || 0;
+    if (collected >= g.targetAmount && g.status === "collecting") {
+      g.status = "ready";
+      await g.save();
+    }
+
+    const me = await User.findById(req.userId).lean();
+    const updated = await Group.findById(g._id).lean();
     res.json({
       ok: true,
       walletBalance: me.walletBalance,
@@ -153,7 +147,5 @@ groupsRouter.post("/:id/contribute", async (req, res) => {
     });
   } catch (e) {
     res.status(400).json({ error: e.message });
-  } finally {
-    session.endSession();
   }
 });

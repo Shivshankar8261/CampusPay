@@ -15,6 +15,7 @@ import { savingsRouter } from "./routes/savings.js";
 import { loansRouter } from "./routes/loans.js";
 import { parentRouter } from "./routes/parent.js";
 import { usersRouter } from "./routes/users.js";
+import { creditRouter } from "./routes/credit.js";
 
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
@@ -33,6 +34,11 @@ app.use("/api/savings", authRequired, savingsRouter);
 app.use("/api/loans", authRequired, loansRouter);
 app.use("/api/parent", authRequired, parentRouter);
 app.use("/api/users", authRequired, usersRouter);
+app.use("/api/credit", authRequired, creditRouter);
+
+app.use((req, res) => {
+  res.status(404).json({ error: "Not found" });
+});
 
 const port = Number(process.env.PORT) || 4000;
 

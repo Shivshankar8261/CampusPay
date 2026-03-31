@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120" viewBox="0 0 200 120" fill="none" aria-hidden="true">
+  <rect width="200" height="120" rx="18" fill="#F8F6F3"/>
+  <circle cx="100" cy="52" r="28" fill="#FF6B6B" opacity="0.15"/>
+  <path d="M88 48h24M100 40v24" stroke="#FF9F43" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  <text x="100" y="98" text-anchor="middle" fill="#2D3142" font-family="system-ui,sans-serif" font-size="10" font-weight="600" opacity="0.4">Nothing here yet — add something fun!</text>
+</svg>

@@ -1,0 +1,14 @@
+{
+  "name": "campuspay",
+  "private": true,
+  "description": "Run API + web together for local development",
+  "scripts": {
+    "setup": "npm install --prefix backend && npm install --prefix frontend && npm install",
+    "dev": "concurrently -k -n api,web -c cyan,magenta \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "smoke": "node scripts/smoke.mjs",
+    "build:web": "npm run build --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

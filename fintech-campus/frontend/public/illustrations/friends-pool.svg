@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="140" viewBox="0 0 220 140" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="p1" x1="0" y1="0" x2="220" y2="140"><stop stop-color="#FFF0E8"/><stop offset="1" stop-color="#F0E8FF"/></linearGradient>
+  </defs>
+  <rect width="220" height="140" rx="20" fill="url(#p1)"/>
+  <ellipse cx="110" cy="88" rx="72" ry="28" fill="#FF6B6B" opacity="0.12"/>
+  <circle cx="72" cy="64" r="22" fill="#FF9F43" opacity="0.55"/>
+  <circle cx="110" cy="52" r="24" fill="#FF6B6B" opacity="0.5"/>
+  <circle cx="148" cy="64" r="22" fill="#26C485" opacity="0.5"/>
+  <path d="M62 90c0-8 10-14 22-14h52c12 0 22 6 22 14v8H62v-8z" fill="#fff" opacity="0.9"/>
+  <text x="110" y="102" text-anchor="middle" fill="#2D3142" font-family="system-ui,sans-serif" font-size="10" font-weight="700" opacity="0.5">SPLIT & SAVE TOGETHER</text>
+</svg>

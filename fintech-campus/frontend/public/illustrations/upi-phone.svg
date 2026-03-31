@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="140" viewBox="0 0 220 140" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="u1" x1="0" y1="0" x2="220" y2="140"><stop stop-color="#E8F4FF"/><stop offset="1" stop-color="#FFF5EB"/></linearGradient>
+  </defs>
+  <rect width="220" height="140" rx="20" fill="url(#u1)"/>
+  <rect x="78" y="28" width="64" height="96" rx="12" fill="#2D3142" opacity="0.88"/>
+  <rect x="86" y="40" width="48" height="64" rx="4" fill="#fff" opacity="0.95"/>
+  <circle cx="110" cy="114" r="4" fill="#fff" opacity="0.4"/>
+  <text x="110" y="78" text-anchor="middle" fill="#FF6B6B" font-family="system-ui,sans-serif" font-size="22" font-weight="800">₹</text>
+  <path d="M94 88h32" stroke="#26C485" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  <text x="110" y="132" text-anchor="middle" fill="#2D3142" font-family="system-ui,sans-serif" font-size="10" font-weight="700" opacity="0.45">TAP. TAG. SPLIT.</text>
+</svg>

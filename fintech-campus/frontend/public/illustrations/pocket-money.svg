@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="140" viewBox="0 0 220 140" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="b1" x1="0" y1="0" x2="220" y2="140"><stop stop-color="#E8FFF5"/><stop offset="1" stop-color="#FFF8E8"/></linearGradient>
+  </defs>
+  <rect width="220" height="140" rx="20" fill="url(#b1)"/>
+  <rect x="40" y="36" width="140" height="72" rx="12" fill="#fff" stroke="#26C485" stroke-width="2" stroke-opacity="0.35"/>
+  <rect x="56" y="52" width="108" height="12" rx="6" fill="#FF6B6B" opacity="0.25"/>
+  <rect x="56" y="72" width="72" height="12" rx="6" fill="#26C485" opacity="0.3"/>
+  <circle cx="170" cy="48" r="16" fill="#FF9F43" opacity="0.5"/>
+  <text x="170" y="54" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif" font-size="14" font-weight="800">₹</text>
+  <text x="110" y="128" text-anchor="middle" fill="#2D3142" font-family="system-ui,sans-serif" font-size="10" font-weight="700" opacity="0.45">POCKET MONEY ON TRACK</text>
+</svg>

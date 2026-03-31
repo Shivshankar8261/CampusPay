@@ -13,16 +13,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { resolveMongoUri } from "./resolveMongoUri.js";
 
-/** Load demo users and sample data. If reset=true, drops DB first (CLI seed). */
-export async function runDemoSeed({ reset = false } = {}) {
-  if (reset) await mongoose.connection.dropDatabase();
-  else if ((await User.countDocuments()) > 0) return;
+const DEMO_PASSWORD = "demo1234";
 
-  const hash = await bcrypt.hash("demo1234", 10);
-  const [riya, arjun, neha] = await User.create([
+/** Always ensure the 3 demo accounts exist (so login works even if others registered first or DB was partial). */
+export async function ensureDemoUsers() {
+  const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
+  const accounts = [
     {
       email: "riya@campus.demo",
-      passwordHash: hash,
       name: "Riya Sharma",
       phone: "9876500001",
       walletBalance: 8000,
@@ -31,21 +29,55 @@ export async function runDemoSeed({ reset = false } = {}) {
     },
     {
       email: "arjun@campus.demo",
-      passwordHash: hash,
       name: "Arjun Mehta",
       phone: "9876500002",
       walletBalance: 6500,
       campusCreditScore: 640,
+      parentTransparencyEnabled: false,
     },
     {
       email: "neha@campus.demo",
-      passwordHash: hash,
       name: "Neha Kulkarni",
       phone: "9876500003",
       walletBalance: 5200,
       campusCreditScore: 580,
+      parentTransparencyEnabled: false,
     },
-  ]);
+  ];
+
+  for (const a of accounts) {
+    const exists = await User.findOne({ email: a.email });
+    if (!exists) {
+      await User.create({
+        email: a.email,
+        passwordHash,
+        name: a.name,
+        phone: a.phone,
+        walletBalance: a.walletBalance,
+        campusCreditScore: a.campusCreditScore,
+        parentTransparencyEnabled: a.parentTransparencyEnabled,
+      });
+    }
+  }
+}
+
+/** Load sample transactions, groups, etc. Skips when sample data already exists unless reset=true. */
+export async function runDemoSeed({ reset = false } = {}) {
+  if (reset) await mongoose.connection.dropDatabase();
+
+  await ensureDemoUsers();
+
+  if (!reset && (await Transaction.countDocuments()) > 0) {
+    return;
+  }
+
+  const riya = await User.findOne({ email: "riya@campus.demo" });
+  const arjun = await User.findOne({ email: "arjun@campus.demo" });
+  const neha = await User.findOne({ email: "neha@campus.demo" });
+  if (!riya || !arjun || !neha) {
+    console.warn("Demo users incomplete — skipping sample data.");
+    return;
+  }
 
   await Transaction.create([
     {
@@ -87,37 +119,46 @@ export async function runDemoSeed({ reset = false } = {}) {
     },
   ]);
 
-  const g = await Group.create({
-    name: "Goa Trip",
-    creatorId: riya._id,
-    targetAmount: 16000,
-    inviteCode: "GOA2026",
-    memberIds: [riya._id, arjun._id, neha._id],
-    status: "collecting",
-  });
+  const existingGroup = await Group.findOne({ inviteCode: "GOA2026" });
+  if (!existingGroup) {
+    const g = await Group.create({
+      name: "Goa Trip",
+      creatorId: riya._id,
+      targetAmount: 16000,
+      inviteCode: "GOA2026",
+      memberIds: [riya._id, arjun._id, neha._id],
+      status: "collecting",
+    });
 
-  await GroupContribution.create([
-    { groupId: g._id, userId: riya._id, amount: 4000 },
-    { groupId: g._id, userId: arjun._id, amount: 2500 },
-  ]);
+    await GroupContribution.create([
+      { groupId: g._id, userId: riya._id, amount: 4000 },
+      { groupId: g._id, userId: arjun._id, amount: 2500 },
+    ]);
+  }
 
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  await BudgetCycle.create({
-    userId: riya._id,
-    cycleType: "weekly",
-    budgetAmount: 3500,
-    periodStart: start,
-    periodEnd: addDays(start, 7),
-  });
+  const hasBudget = await BudgetCycle.findOne({ userId: riya._id });
+  if (!hasBudget) {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    await BudgetCycle.create({
+      userId: riya._id,
+      cycleType: "weekly",
+      budgetAmount: 3500,
+      periodStart: start,
+      periodEnd: addDays(start, 7),
+    });
+  }
 
-  await SavingsGoal.create({
-    userId: riya._id,
-    name: "Goa Trip",
-    targetAmount: 5000,
-    currentAmount: 1400,
-    autoAllocatePercent: 15,
-  });
+  const hasGoal = await SavingsGoal.findOne({ userId: riya._id, name: "Goa Trip" });
+  if (!hasGoal) {
+    await SavingsGoal.create({
+      userId: riya._id,
+      name: "Goa Trip",
+      targetAmount: 5000,
+      currentAmount: 1400,
+      autoAllocatePercent: 15,
+    });
+  }
 
   console.log("Demo data ready — log in with riya@campus.demo / demo1234 (see README)");
 }

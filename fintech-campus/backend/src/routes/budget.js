@@ -67,7 +67,7 @@ budgetRouter.get("/insights", async (req, res) => {
           userId: uid,
           direction: "out",
           createdAt: { $gte: a, $lt: b },
-          kind: "upi_simulated",
+          kind: { $in: ["upi_simulated", "pool_contribution"] },
         },
       },
       { $group: { _id: "$category", total: { $sum: "$amount" } } },

@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 export function authRequired(req, res, next) {
   const header = req.headers.authorization || "";
@@ -8,7 +9,11 @@ export function authRequired(req, res, next) {
   }
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = payload.sub;
+    const sub = payload.sub;
+    if (!sub || !mongoose.Types.ObjectId.isValid(sub)) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+    req.userId = sub;
     next();
   } catch {
     return res.status(401).json({ error: "Invalid token" });

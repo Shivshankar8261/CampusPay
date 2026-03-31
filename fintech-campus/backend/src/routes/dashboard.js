@@ -42,7 +42,9 @@ dashboardRouter.get("/", async (req, res) => {
         note: t.note,
         kind: t.kind,
         createdAt: t.createdAt,
-        peer: t.peerUserId ? { name: t.peerUserId.name, email: t.peerUserId.email } : null,
+        peer: t.peerUserId
+          ? { name: t.peerUserId.name || "User", email: t.peerUserId.email || "" }
+          : null,
       })),
     });
   } catch (e) {

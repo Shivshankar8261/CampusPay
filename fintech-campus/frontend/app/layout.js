@@ -1,14 +1,14 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "CampusPay",
-  description: "Group pools, pocket money, and campus credit — student fintech MVP",
+  title: "CampusPay — money with your squad",
+  description: "Pocket money, group pools, and campus credit for students in India.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="app-body">{children}</body>
     </html>
   );
 }

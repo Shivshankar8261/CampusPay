@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="140" viewBox="0 0 220 140" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="c1" x1="0" y1="0" x2="220" y2="140"><stop stop-color="#F5EEFF"/><stop offset="1" stop-color="#FFEEF2"/></linearGradient>
+  </defs>
+  <rect width="220" height="140" rx="20" fill="url(#c1)"/>
+  <path d="M48 88c12-20 32-32 62-32s50 12 62 32" stroke="#7C6CF0" stroke-width="3" stroke-linecap="round" opacity="0.35"/>
+  <circle cx="78" cy="56" r="18" fill="#FF6B6B" opacity="0.45"/>
+  <circle cx="142" cy="56" r="18" fill="#26C485" opacity="0.45"/>
+  <path d="M92 72h36c8 0 14 6 14 14v4H78v-4c0-8 6-14 14-14z" fill="#fff" stroke="#2D3142" stroke-opacity="0.12" stroke-width="2"/>
+  <text x="110" y="118" text-anchor="middle" fill="#2D3142" font-family="system-ui,sans-serif" font-size="10" font-weight="700" opacity="0.45">TRUST YOUR BATCHMATES</text>
+</svg>
